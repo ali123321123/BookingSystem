@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class EmployeeServiceImp implements EmployeeService {
+public class EmployeeServiceImp implements EmployeeService{
     private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
 
