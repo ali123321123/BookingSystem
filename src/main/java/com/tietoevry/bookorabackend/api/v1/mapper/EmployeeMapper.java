@@ -12,7 +12,7 @@ public interface EmployeeMapper {
 
     EmployeeDTO employeeToEmployeeDTO(Employee employee);
 
-    Employee EmployeeDTOtoEmployee(EmployeeDTO employeeDTO);
+    Employee employeeDTOtoEmployee(EmployeeDTO employeeDTO);
 
 }
 

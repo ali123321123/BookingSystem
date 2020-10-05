@@ -1,5 +1,5 @@
 
-/*
+
 package com.tietoevry.bookorabackend.api.v1.mapper;
 
 import com.tietoevry.bookorabackend.api.v1.model.ZoneDTO;
@@ -15,4 +15,3 @@ public interface ZoneMapper {
 
     Zone zoneDTOtoZone(ZoneDTO zoneDTO);
 }
-*/
