@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class EmployeeServiceImp implements EmployeeService{
+public class EmployeeServiceImp implements EmployeeService {
+
     private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
 
@@ -20,7 +21,6 @@ public class EmployeeServiceImp implements EmployeeService{
         this.employeeMapper = employeeMapper;
         this.employeeRepository = employeeRepository;
     }
-
 
     @Override
     public EmployeeListDTO getAllEmployees() {
@@ -34,10 +34,14 @@ public class EmployeeServiceImp implements EmployeeService{
 
     @Override
     public EmployeeDTO getEmployeeById(Long id) {
-        return employeeRepository.findById(id).map(employeeMapper::employeeToEmployeeDTO).map(employeeDTO -> {
-            employeeDTO.setEmployeeUrl(getEmployeeUrl(id));
-            return employeeDTO;
-        }).orElseThrow(RuntimeException::new);//TODO make exception handler
+        return employeeRepository
+                .findById(id)
+                .map(employeeMapper::employeeToEmployeeDTO)
+                .map(employeeDTO -> {
+                    employeeDTO.setEmployeeUrl(getEmployeeUrl(id));
+                    return employeeDTO;
+                })
+                .orElseThrow(RuntimeException::new);//TODO make exception handler
     }
 
     @Override
@@ -56,20 +60,9 @@ public class EmployeeServiceImp implements EmployeeService{
 
     }
 
-   /* @Override
-    public EmployeeDTO patchEmployee(Long id, EmployeeDTO employeeDTO) {
-        return employeeRepository.findById(id).map(employee -> {
-            if(employeeDTO.get)
-        })
-
-    }
-
-    */
-
     @Override
     public void deleteEmployeeDTO(Long id) {
         employeeRepository.deleteById(id);
-
     }
 
     private String getEmployeeUrl(Long id) {
@@ -81,6 +74,5 @@ public class EmployeeServiceImp implements EmployeeService{
         EmployeeDTO employeeDTO = employeeMapper.employeeToEmployeeDTO(savedEmloyee);
         employeeDTO.setEmployeeUrl(getEmployeeUrl(savedEmloyee.getId()));
         return employeeDTO;
-
     }
 }

@@ -12,7 +12,7 @@ public interface EmployeeService {
 
     EmployeeDTO saveEmployeeByDTO(Long id, EmployeeDTO employeeDTO);
 
- //   EmployeeDTO patchEmployee(Long id, EmployeeDTO employeeDTO);
+    //EmployeeDTO patchEmployee(Long id, EmployeeDTO employeeDTO);
 
     void deleteEmployeeDTO(Long id);
 }
