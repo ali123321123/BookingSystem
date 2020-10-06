@@ -3,9 +3,11 @@ package com.tietoevry.bookorabackend.controllers;
 import com.tietoevry.bookorabackend.api.v1.model.EmployeeDTO;
 import com.tietoevry.bookorabackend.api.v1.model.EmployeeListDTO;
 import com.tietoevry.bookorabackend.services.EmployeeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Employee", description = "Employee API")
 @RestController
 @RequestMapping(EmployeeController.BASE_URL)
 public class EmployeeController {
