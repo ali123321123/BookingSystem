@@ -11,6 +11,8 @@ import com.tietoevry.bookorabackend.repositories.EmployeeRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +64,7 @@ public class EmployeeServiceImp implements EmployeeService {
             Employee savedEmployee = employeeRepository.save(employee);
 
             ConfirmationToken confirmationToken = new ConfirmationToken(savedEmployee);
+            confirmationToken.setExpiryDate(calculateExpiryDate(24*60));
             confirmationTokenRepository.save(confirmationToken);
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -109,5 +112,11 @@ public class EmployeeServiceImp implements EmployeeService {
         Employee employee = employeeRepository.findByEmailIgnoreCase(email);
         if (employee != null) return true;
         return false;
+    }
+
+    private Timestamp calculateExpiryDate(int expiryTime){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE,expiryTime);
+        return new Timestamp(calendar.getTime().getTime());
     }
 }

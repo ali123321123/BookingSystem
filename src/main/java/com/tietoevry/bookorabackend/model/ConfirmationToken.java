@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public class ConfirmationToken {
 
     @OneToOne(fetch = FetchType.EAGER)
     private Employee employee;
+
+    private Timestamp expiryDate;
 
     public ConfirmationToken(Employee employee) {
         this.employee = employee;
