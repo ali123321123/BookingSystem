@@ -16,11 +16,17 @@ public class DataLoader implements CommandLineRunner{
 
     @Override
     public void run(String... args) throws Exception {
-        Employee employee1 = new Employee();
-        employee1.setEmail("1@abc.com");
-        employee1.setPassword("123123");
-        employee1.setFirstName("John");
-        employee1.setLastName("Johnson");
+
+        LoadEmployees();
+    }
+
+    private void LoadEmployees() {
+        Employee employee1 = new Employee("Per", "Peterson", "per.peterson@tietoevry.com","111");
+        Employee employee2 = new Employee("John", "Johnson", "oslomet7@gmail.com","222");
+        Employee employee3 = new Employee("Kari", "Hansen", "oslomet6@gmail.com","333");
         employeeRepository.save(employee1);
+        employeeRepository.save(employee2);
+        employeeRepository.save(employee3);
+
     }
 }

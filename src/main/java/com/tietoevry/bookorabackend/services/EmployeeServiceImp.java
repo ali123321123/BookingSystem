@@ -4,8 +4,10 @@ import com.tietoevry.bookorabackend.api.v1.mapper.EmployeeMapper;
 import com.tietoevry.bookorabackend.api.v1.model.EmployeeDTO;
 import com.tietoevry.bookorabackend.api.v1.model.EmployeeListDTO;
 import com.tietoevry.bookorabackend.controllers.EmployeeController;
+import com.tietoevry.bookorabackend.model.ConfirmationToken;
 import com.tietoevry.bookorabackend.model.Employee;
 import com.tietoevry.bookorabackend.repositories.EmployeeRepository;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +18,12 @@ public class EmployeeServiceImp implements EmployeeService {
 
     private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
+    private final EmailSenderService emailSenderService;
 
-    public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository) {
+    public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository, EmailSenderService emailSenderService) {
         this.employeeMapper = employeeMapper;
         this.employeeRepository = employeeRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     @Override
@@ -46,7 +50,30 @@ public class EmployeeServiceImp implements EmployeeService {
 
     @Override
     public EmployeeDTO createNewEmployee(EmployeeDTO employeeDTO) {
-        return saveAndReturnDTO(employeeMapper.employeeDTOtoEmployee(employeeDTO));
+
+        if(existedByEmail(employeeDTO.getEmail())){
+            throw new RuntimeException("Email existed!"); //TODO make exception handler
+        }
+        else{
+            Employee employee = employeeMapper.employeeDTOtoEmployee(employeeDTO);
+            Employee savedEmployee = employeeRepository.save(employee);
+
+            ConfirmationToken confirmationToken = new ConfirmationToken(savedEmployee);
+
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(employee.getEmail());
+            mailMessage.setSubject("Complete Registration!");
+            mailMessage.setFrom("oslomet8@gmail.com");
+            mailMessage.setText("To confirm your account, please click here : "
+                    +"http://localhost:8080/confirm-account?token="+confirmationToken.getConfirmationToken());
+
+            emailSenderService.sendEmail(mailMessage);
+
+            EmployeeDTO employeeDTOtoReturn = employeeMapper.employeeToEmployeeDTO(savedEmployee);
+            employeeDTO.setEmployeeUrl(getEmployeeUrl(savedEmployee.getId()));
+
+            return employeeDTOtoReturn;
+        }
 
     }
 
@@ -56,8 +83,6 @@ public class EmployeeServiceImp implements EmployeeService {
         employeeToSave.setId(id);
 
         return saveAndReturnDTO(employeeToSave);
-
-
     }
 
     @Override
@@ -74,5 +99,11 @@ public class EmployeeServiceImp implements EmployeeService {
         EmployeeDTO employeeDTO = employeeMapper.employeeToEmployeeDTO(savedEmloyee);
         employeeDTO.setEmployeeUrl(getEmployeeUrl(savedEmloyee.getId()));
         return employeeDTO;
+    }
+
+    private boolean existedByEmail(String email){
+        Employee employee = employeeRepository.findByEmailIgnoreCase(email);
+        if (employee != null) return true;
+        return false;
     }
 }
