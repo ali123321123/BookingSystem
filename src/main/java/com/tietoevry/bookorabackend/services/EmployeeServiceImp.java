@@ -6,6 +6,7 @@ import com.tietoevry.bookorabackend.api.v1.model.EmployeeListDTO;
 import com.tietoevry.bookorabackend.controllers.EmployeeController;
 import com.tietoevry.bookorabackend.model.ConfirmationToken;
 import com.tietoevry.bookorabackend.model.Employee;
+import com.tietoevry.bookorabackend.repositories.ConfirmationTokenRepository;
 import com.tietoevry.bookorabackend.repositories.EmployeeRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,13 @@ public class EmployeeServiceImp implements EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
     private final EmailSenderService emailSenderService;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
 
-    public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository, EmailSenderService emailSenderService) {
+    public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository, EmailSenderService emailSenderService, ConfirmationTokenRepository confirmationTokenRepository) {
         this.employeeMapper = employeeMapper;
         this.employeeRepository = employeeRepository;
         this.emailSenderService = emailSenderService;
+        this.confirmationTokenRepository = confirmationTokenRepository;
     }
 
     @Override
@@ -59,6 +62,7 @@ public class EmployeeServiceImp implements EmployeeService {
             Employee savedEmployee = employeeRepository.save(employee);
 
             ConfirmationToken confirmationToken = new ConfirmationToken(savedEmployee);
+            confirmationTokenRepository.save(confirmationToken);
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(employee.getEmail());

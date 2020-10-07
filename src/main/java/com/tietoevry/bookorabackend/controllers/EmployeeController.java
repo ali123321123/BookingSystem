@@ -51,8 +51,5 @@ public class EmployeeController {
         employeeService.deleteEmployeeDTO(id);
     }
 
-    @GetMapping("/confirm-account?token={confirmationToken}")
-    public EmployeeDTO employeeDTO(@PathVariable String confirmationToken){
-        return confirmationTokenService.checkToken(confirmationToken); //TODO not complete
-    }
+
 }
