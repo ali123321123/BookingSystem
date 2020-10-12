@@ -5,15 +5,17 @@ import com.tietoevry.bookorabackend.api.v1.model.EmployeeDTO;
 import com.tietoevry.bookorabackend.api.v1.model.EmployeeListDTO;
 import com.tietoevry.bookorabackend.controllers.EmployeeController;
 import com.tietoevry.bookorabackend.model.ConfirmationToken;
+import com.tietoevry.bookorabackend.model.ERole;
 import com.tietoevry.bookorabackend.model.Employee;
+import com.tietoevry.bookorabackend.model.Role;
 import com.tietoevry.bookorabackend.repositories.ConfirmationTokenRepository;
 import com.tietoevry.bookorabackend.repositories.EmployeeRepository;
+import com.tietoevry.bookorabackend.repositories.RoleRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,12 +25,14 @@ public class EmployeeServiceImp implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final EmailSenderService emailSenderService;
     private final ConfirmationTokenRepository confirmationTokenRepository;
+    private final RoleRepository roleRepository;
 
-    public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository, EmailSenderService emailSenderService, ConfirmationTokenRepository confirmationTokenRepository) {
+    public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository, EmailSenderService emailSenderService, ConfirmationTokenRepository confirmationTokenRepository, RoleRepository roleRepository) {
         this.employeeMapper = employeeMapper;
         this.employeeRepository = employeeRepository;
         this.emailSenderService = emailSenderService;
         this.confirmationTokenRepository = confirmationTokenRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -56,15 +60,51 @@ public class EmployeeServiceImp implements EmployeeService {
     @Override
     public EmployeeDTO createNewEmployee(EmployeeDTO employeeDTO) {
 
+
         if(existedByEmail(employeeDTO.getEmail())){
             throw new RuntimeException("Email existed!"); //TODO make exception handler
         }
-        else{
+        else {
             Employee employee = employeeMapper.employeeDTOtoEmployee(employeeDTO);
+
+            Set<String> strRoles = employeeDTO.getRole();
+            Set<Role> roles = new HashSet<>();
+
+            if (strRoles == null) {
+                Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                roles.add(userRole);
+            } else {
+                strRoles.forEach(role -> {
+                    switch (role) {
+                        case "admin":
+                            Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                            roles.add(adminRole);
+
+                            break;
+                        case "mod":
+                            Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                            roles.add(modRole);
+
+                            break;
+                        default:
+                            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                            roles.add(userRole);
+                    }
+                });
+            }
+
+
+
+            employee.setRoles(roles);
             Employee savedEmployee = employeeRepository.save(employee);
 
+
             ConfirmationToken confirmationToken = new ConfirmationToken(savedEmployee);
-            confirmationToken.setExpiryDate(calculateExpiryDate(24*60));
+            confirmationToken.setExpiryDate(calculateExpiryDate(24 * 60));
             confirmationTokenRepository.save(confirmationToken);
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();

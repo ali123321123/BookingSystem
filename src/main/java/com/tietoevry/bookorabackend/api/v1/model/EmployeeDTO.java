@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +17,7 @@ public class EmployeeDTO {
     private String lastName;
     private String email;
     private String password;
+    private Set<String> role;
 
     @JsonProperty("employee_url")
     private String employeeUrl;

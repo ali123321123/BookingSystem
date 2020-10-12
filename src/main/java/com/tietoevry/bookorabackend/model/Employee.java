@@ -44,6 +44,12 @@ public class Employee{
     @OneToOne(mappedBy = "employee")
     private ConfirmationToken confirmationToken;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(	name = "employee_roles",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
     public Employee(@NotNull(message = "You must fill in first name.") String firstName, @NotNull(message = "You must fill in last name.") String lastName, @NotNull(message = "You must fill in e-mail.") @Email String email, @NotNull String password) {
         this.firstName = firstName;
         this.lastName = lastName;
