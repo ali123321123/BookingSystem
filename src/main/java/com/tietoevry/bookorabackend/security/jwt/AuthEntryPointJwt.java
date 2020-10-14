@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+//Catch authentication error
+
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
@@ -18,7 +20,8 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+						 AuthenticationException authException) throws IOException, ServletException {
+
 		logger.error("Unauthorized error: {}", authException.getMessage());
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
 	}

@@ -16,8 +16,6 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-
-
     private String email;
 
     @JsonIgnore
@@ -33,15 +31,15 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
-    public static UserDetailsImpl build(Employee user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
+    public static UserDetailsImpl build(Employee employee) {
+        List<GrantedAuthority> authorities = employee.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
 
         return new UserDetailsImpl(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
+                employee.getId(),
+                employee.getEmail(),
+                employee.getPassword(),
                 authorities);
     }
 
@@ -65,9 +63,8 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return email;
     }
-
 
     @Override
     public boolean isAccountNonExpired() {

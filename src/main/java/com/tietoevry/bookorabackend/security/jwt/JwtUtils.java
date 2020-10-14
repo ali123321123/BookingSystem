@@ -9,9 +9,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+
+
 import java.util.Date;
 
-//generate Token
+/*
+This clas has 3 functions:
+	1. generate a JWT from username, date, expiration, secret
+	2. get username from JWT
+	3. validate a JWT
+*/
+
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -22,24 +30,27 @@ public class JwtUtils {
     @Value("${bezkoder.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    //1. generate a JWT from username, date, expiration, secret
     public String generateJwtToken(Authentication authentication) {
 
+        //Get UserDetails from Authentication object
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-        System.out.println(userPrincipal.getEmail());
 
+        //Use Jwts.class to build JWT, which use DefaultJwtBuilder.class
         return Jwts.builder()
-                .setSubject((userPrincipal.getEmail()))
+                .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
+    //2. get username from JWT
     public String getUserNameFromJwtToken(String token) {
-
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
+    //3. validate a JWT
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);

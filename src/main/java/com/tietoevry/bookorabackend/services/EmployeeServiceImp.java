@@ -11,7 +11,9 @@ import com.tietoevry.bookorabackend.model.Role;
 import com.tietoevry.bookorabackend.repositories.ConfirmationTokenRepository;
 import com.tietoevry.bookorabackend.repositories.EmployeeRepository;
 import com.tietoevry.bookorabackend.repositories.RoleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -26,6 +28,9 @@ public class EmployeeServiceImp implements EmployeeService {
     private final EmailSenderService emailSenderService;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final RoleRepository roleRepository;
+    @Autowired
+    PasswordEncoder encoder;
+
 
     public EmployeeServiceImp(EmployeeMapper employeeMapper, EmployeeRepository employeeRepository, EmailSenderService emailSenderService, ConfirmationTokenRepository confirmationTokenRepository, RoleRepository roleRepository) {
         this.employeeMapper = employeeMapper;
@@ -61,11 +66,17 @@ public class EmployeeServiceImp implements EmployeeService {
     public EmployeeDTO createNewEmployee(EmployeeDTO employeeDTO) {
 
 
+//problemt var med mapper
+
+        Employee employee = new Employee(employeeDTO.getFirstName(),employeeDTO.getLastName(),employeeDTO.getEmail(),
+                encoder.encode(employeeDTO.getPassword()));
+
+
         if(existedByEmail(employeeDTO.getEmail())){
             throw new RuntimeException("Email existed!"); //TODO make exception handler
         }
         else {
-            Employee employee = employeeMapper.employeeDTOtoEmployee(employeeDTO);
+        //    Employee employee = employeeMapper.employeeDTOtoEmployee(employeeDTO); //Todo fix problem with mapper
 
             Set<String> strRoles = employeeDTO.getRole();
             Set<Role> roles = new HashSet<>();
